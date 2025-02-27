@@ -1,22 +1,336 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Protected Page</title>
-    <script>
-        function checkPassword() {
-            let password = prompt("Enter the password:");
-            if (password !== "yourpassword") {
-                alert("Incorrect password. Access denied.");
-                document.body.innerHTML = "";
-            }
+    <title>Squid Game Challenge</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background: #ff136d;
+            color: white;
+            text-align: center;
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden;
         }
-    </script>
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(45deg, 
+                    rgba(255, 255, 255, 0.1) 25%, 
+                    transparent 25%, 
+                    transparent 50%, 
+                    rgba(255, 255, 255, 0.1) 50%, 
+                    rgba(255, 255, 255, 0.1) 75%, 
+                    transparent 75%, 
+                    transparent);
+            background-size: 100px 100px;
+            z-index: -1;
+            opacity: 0.5;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #ff136d, #ff2e84);
+            z-index: -2;
+        }
+
+        #auth {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        #auth input {
+            padding: 15px;
+            font-size: 18px;
+            border: none;
+            border-radius: 8px;
+            background: #1f1f1f;
+            color: white;
+            margin: 10px;
+            width: 200px;
+            text-align: center;
+        }
+
+        #auth button {
+            padding: 15px 30px;
+            font-size: 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: white;
+            color: #ff136d;
+            transition: all 0.3s;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        #auth button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        #game {
+            display: none;
+            padding-top: 30px;
+        }
+
+        #lightStatus {
+            font-size: 60px;
+            margin: 30px 0;
+            text-shadow: 0 0 20px currentColor;
+            animation: pulse 1s infinite;
+            transition: color 0.3s ease-in-out;
+        }
+
+        #player {
+            width: 50px;
+            height: 50px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="35" r="25" fill="white"/><rect x="25" y="40" width="50" height="45" fill="white"/></svg>');
+            position: absolute;
+            bottom: 20%;
+            transition: left 0.3s;
+        }
+
+        #progressContainer {
+            width: 80%;
+            height: 40px;
+            background: rgba(0, 0, 0, 0.5);
+            margin: 30px auto;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+
+        #progressBar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #00ff00, #00dd00);
+            transition: width 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            box-shadow: 0 0 10px #00ff00;
+        }
+
+        #moveBtn {
+            padding: 20px 40px;
+            font-size: 24px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            background: white;
+            color: #ff136d;
+            transition: all 0.3s;
+            font-weight: bold;
+            margin: 20px;
+            text-transform: uppercase;
+        }
+
+        #moveBtn:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        #moveBtn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        #message {
+            font-size: 40px;
+            margin: 30px;
+            text-shadow: 0 0 10px currentColor;
+            animation: messageGlow 2s infinite;
+        }
+
+        .doll {
+            width: 150px;
+            height: 200px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 140"><circle cx="50" cy="30" r="25" fill="%23ffcccc"/><rect x="25" y="35" width="50" height="80" fill="%23ff9999"/><circle cx="40" cy="25" r="5" fill="black"/><circle cx="60" cy="25" r="5" fill="black"/></svg>');
+            background-size: contain;
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            transform-style: preserve-3d;
+            transition: transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+            pointer-events: none;
+        }
+
+        .doll.turned {
+            transform: translateX(-50%) rotateY(180deg);
+        }
+
+        @keyframes pulse {
+             0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.02); opacity: 0.9; }
+        }
+
+        @keyframes messageGlow {
+            0%, 100% { text-shadow: 0 0 10px currentColor; }
+            50% { text-shadow: 0 0 20px currentColor, 0 0 30px currentColor; }
+        }
+    </style>
 </head>
-<body onload="checkPassword()">
-    <h1>Confidential Numbers</h1>
-    <p>Number 1: 12345</p>
-    <p>Number 2: 67890</p>
+<body>
+    <div id="auth">
+        <h2>🦑 Enter Password 🦑</h2>
+        <div style="font-size: 2em; margin: 20px">△ □ ○</div>
+        <input type="password" id="passwordInput" placeholder="Password" />
+        <br>
+        <button id="authBtn">Enter Game</button>
+    </div>
+
+    <div id="game">
+        <div class="doll" id="doll"></div>
+        <h1>Red Light, Green Light</h1>
+        <div id="lightStatus">GREEN LIGHT</div>
+        <div id="progressContainer">
+            <div id="progressBar"></div>
+        </div>
+        <div id="player"></div>
+        <button id="moveBtn">Move Forward</button>
+        <div id="message"></div>
+    </div>
+
+    <script>
+        // Password Authentication
+        const correctPassword = "squidgame"; // Change as needed
+        document.getElementById("authBtn").addEventListener("click", function(){
+            const input = document.getElementById("passwordInput").value;
+            if(input === correctPassword){
+                document.getElementById("auth").style.display = "none";
+                document.getElementById("game").style.display = "block";
+                startGame();
+            } else {
+                alert("Incorrect password. Try again.");
+            }
+        });
+
+        // Game Variables
+        let gameState = "green";
+        let progress = 0;
+        let lightTimer;
+        let isAnimating = false;
+        let gameActive = false;
+
+        function startGame() {
+            gameActive = true;
+            progress = 0;
+            document.getElementById('message').innerText = '';
+            document.getElementById('moveBtn').disabled = false;
+            updateProgressBar();
+            updateLightDisplay();
+            scheduleLightChange();
+        }
+
+        function scheduleLightChange() {
+            if (!gameActive) return;
+            clearTimeout(lightTimer);
+            const duration = gameState === "green" ? getRandomGreenDuration() : getRandomRedDuration();
+            lightTimer = setTimeout(changeLight, duration);
+        }
+
+        function changeLight() {
+            if (!gameActive) return;
+            if (isAnimating) return;
+            
+            isAnimating = true;
+            const doll = document.getElementById('doll');
+            
+            gameState = gameState === "green" ? "red" : "green";
+            
+            // Smooth doll rotation
+            if (gameState === "red") {
+                doll.classList.add('turned');
+            } else {
+                doll.classList.remove('turned');
+            }
+
+            updateLightDisplay();
+            
+            // Wait for animation to complete
+            setTimeout(() => {
+                isAnimating = false;
+                if (gameActive) {
+                    scheduleLightChange();
+                }
+            }, 500);
+        }
+
+        function getRandomGreenDuration(){
+            return Math.floor(Math.random()*2000) + 2000; // 2000 to 4000 ms
+        }
+        function getRandomRedDuration(){
+            return Math.floor(Math.random()*2000) + 1000; // 1000 to 3000 ms
+        }
+
+        function updateLightDisplay() {
+            const lightDiv = document.getElementById("lightStatus");
+            lightDiv.style.color = gameState === "green" ? "#00FF00" : "#FF0000";
+            lightDiv.innerText = gameState === "green" ? "GREEN LIGHT" : "RED LIGHT";
+        }
+
+        function updateProgressBar() {
+            requestAnimationFrame(() => {
+                document.getElementById("progressBar").style.width = progress + "%";
+            });
+        }
+
+        // Handle Move button clicks with debouncing
+        let moveDebounceTimer;
+        document.getElementById("moveBtn").addEventListener("click", function() {
+            if (!gameActive || isAnimating) return;
+            
+            clearTimeout(moveDebounceTimer);
+            moveDebounceTimer = setTimeout(() => {
+                if (gameState === "green") {
+                    progress += 10;
+                    if (progress >= 100) {
+                        gameActive = false;
+                        progress = 100;
+                        updateProgressBar();
+                        document.getElementById("message").innerText = "You Won! 🎉";
+                        clearTimeout(lightTimer);
+                        this.disabled = true;
+                        return;
+                    }
+                    updateProgressBar();
+                } else {
+                    gameActive = false;
+                    document.getElementById("message").innerText = "Game Over! You moved during RED LIGHT. ☠️";
+                    clearTimeout(lightTimer);
+                    this.disabled = true;
+                }
+            }, 50);
+        });
+
+        // Password check with Enter key support
+        document.getElementById("passwordInput").addEventListener("keyup", function(event) {
+            if (event.key === "Enter") {
+                document.getElementById("authBtn").click();
+            }
+        });
+    </script>
 </body>
 </html>
