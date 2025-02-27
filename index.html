@@ -337,7 +337,7 @@
       100% { transform: scale(1); }
     }
 
-    /* Remove disappearing animation; always keep the button visible */
+    /* Ensure move-button is always visible (no disappearing animation) */
     .move-button {
       transition: all 0.3s ease;
       opacity: 1;
@@ -382,6 +382,32 @@
         top: 10%;
       }
     }
+
+    /* Winning images as a popup overlay */
+    .winning-images {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: none;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 20px;
+      z-index: 150;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.9);
+      border-radius: 15px;
+      box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
+      width: 90%;
+      max-width: 600px;
+    }
+    .winning-images.show {
+      display: grid;
+      animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes popIn {
+      from { transform: translate(-50%, -50%) scale(0); }
+      to { transform: translate(-50%, -50%) scale(1); }
+    }
   </style>
 </head>
 <body>
@@ -406,11 +432,13 @@
       </div>
       <div class="message" id="message"></div>
     </div>
-    <div class="winning-images" id="winningImages">
-      <img src="Elissa.jpg" alt="Prize 1">
-      <img src="Joseph.jpg" alt="Prize 2">
-      <img src="Kevin.jpg" alt="Prize 3">
-    </div>
+  </div>
+  
+  <!-- Winning images popup (initially hidden) -->
+  <div class="winning-images" id="winningImages">
+    <img src="Elissa.jpg" alt="Prize 1">
+    <img src="Joseph.jpg" alt="Prize 2">
+    <img src="Kevin.jpg" alt="Prize 3">
   </div>
 
   <div class="auth-overlay" id="auth">
@@ -429,8 +457,6 @@
       const input = document.getElementById("passwordInput").value;
       if(input === correctPassword){
         document.getElementById("auth").style.display = "none";
-        document.querySelector(".auth-overlay").style.display = "none";
-        document.querySelector(".game-container").style.display = "block";
         startGame();
       } else {
         alert("Incorrect password. Try again.");
@@ -513,7 +539,6 @@
         messageEl.innerText = "Game Over!\nYou moved during RED LIGHT";
         messageEl.className = "message visible lose";
         clearTimeout(lightTimer);
-        // Instead of hiding, disable the button so it remains visible
         moveBtn.disabled = true;
         document.getElementById("retryBtn").style.display = "inline-block";
       }
