@@ -2,16 +2,14 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <!-- Added maximum-scale=1.0 to prevent zooming on double tap -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>The Sqout Game Challenge</title>
   <style>
+    /* Global Reset */
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      -webkit-user-select: none; /* Disable text selection on iOS Safari */
-      -webkit-touch-callout: none; /* Disable callout (copy/paste) on iOS Safari */
     }
   
     @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap');
@@ -19,7 +17,7 @@
     :root {
       --squid-pink: #ff0067;
       --squid-dark: #1a1a1a;
-      --player-size: 60px;
+      --player-size: min(60px, 15vw);
     }
 
     body {
@@ -28,11 +26,13 @@
       color: white;
       min-height: 100vh;
       overflow-x: hidden;
+      touch-action: manipulation;
     }
 
     .game-container {
       position: relative;
       min-height: 100vh;
+      height: 100vh; /* Ensure full height on mobile */
       background: linear-gradient(135deg, var(--squid-pink) 0%, #ff4d94 100%);
       overflow: hidden;
     }
@@ -57,13 +57,14 @@
       perspective: 1000px;
       position: relative;
       height: 100vh;
+      width: 100%;
     }
 
     .doll {
-      width: 150px;
-      height: 225px;
+      width: min(120px, 30vw);
+      height: min(180px, 45vw);
       position: absolute;
-      top: 50px;
+      top: 8vh;
       left: 50%;
       transform-style: preserve-3d;
       transform: translateX(-50%);
@@ -97,7 +98,7 @@
       position: absolute;
       bottom: 0;
       width: 100%;
-      height: 40%;
+      height: 50%; /* Increased for better mobile visibility */
       background: linear-gradient(0deg, rgba(0,0,0,0.8), transparent);
       transform: rotateX(60deg);
       transform-origin: bottom;
@@ -108,7 +109,7 @@
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
-      width: 60%;
+      width: 80%; /* Wider path for mobile */
       height: 100%;
       background: repeating-linear-gradient(
         90deg,
@@ -179,12 +180,13 @@
 
     .player {
       position: absolute;
-      bottom: 15%;
+      bottom: 30%; /* Raised position for better visibility */
       left: 10%;
       width: var(--player-size);
       height: var(--player-size);
       transition: left 0.3s ease-out;
       filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5));
+      z-index: 15; /* Ensure player is above other elements */
     }
 
     .player-avatar {
@@ -201,13 +203,15 @@
 
     .light-status {
       position: absolute;
-      top: 20%;
+      top: 25vh; /* Better positioning for mobile */
       left: 50%;
       transform: translateX(-50%);
-      font-size: clamp(2rem, 8vw, 4rem);
+      font-size: min(10vw, 3rem); /* Responsive font size */
       font-weight: bold;
       text-shadow: 0 0 20px currentColor;
       z-index: 20;
+      width: 100%;
+      text-align: center;
     }
 
     .auth-overlay {
@@ -231,13 +235,18 @@
       max-width: 400px;
     }
 
+    .auth-box h2 {
+      font-size: min(6vw, 1.5rem);
+      margin-bottom: 1rem;
+    }
+
     .auth-box input {
       background: rgba(255,255,255,0.1);
       border: none;
       padding: 1rem;
       color: white;
       border-radius: 8px;
-      margin: 1rem;
+      margin: 1rem 0;
       font-size: 1.2rem;
       width: 80%;
     }
@@ -246,15 +255,16 @@
       background: var(--squid-pink);
       color: white;
       border: none;
-      padding: clamp(0.5rem, 3vw, 1rem) clamp(1rem, 6vw, 2rem);
-      font-size: clamp(1rem, 4vw, 1.2rem);
+      padding: min(3vw, 1rem) min(6vw, 2rem);
+      font-size: min(5vw, 1.2rem);
       border-radius: 8px;
       cursor: pointer;
-      /* Prevent double-tap zoom on iOS */
-      touch-action: manipulation;
+      transition: transform 0.2s, box-shadow 0.2s;
+      -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
+      outline: none; /* Remove focus outline */
     }
 
-    .game-button:hover {
+    .game-button:hover, .game-button:active {
       transform: translateY(-2px);
       box-shadow: 0 5px 15px rgba(255,0,103,0.4);
     }
@@ -264,12 +274,12 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      font-size: clamp(1.5rem, 6vw, 3rem);
+      font-size: min(7vw, 2.5rem);
       font-weight: bold;
       text-shadow: 0 0 10px currentColor;
       z-index: 100;
       background: rgba(0, 0, 0, 0.9);
-      padding: 2rem;
+      padding: 1.5rem;
       border-radius: 15px;
       box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
       width: 90%;
@@ -297,7 +307,7 @@
 
     .controls {
       position: fixed;
-      bottom: clamp(1rem, 5vh, 5%);
+      bottom: 10vh; /* Better positioning for mobile */
       left: 50%;
       transform: translateX(-50%);
       z-index: 30;
@@ -305,8 +315,8 @@
       flex-direction: column;
       align-items: center;
       gap: 1rem;
-      width: 90%;
-      max-width: 400px;
+      width: 100%;
+      padding: 0 1rem;
     }
 
     .game-container.green-light {
@@ -325,7 +335,6 @@
       border: 2px solid #ff3333;
       text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
       box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
-      touch-action: manipulation;
     }
 
     @keyframes pulse {
@@ -335,15 +344,18 @@
     }
 
     .move-button {
-      /* Removed transition to avoid glitches */
+      transition: all 0.3s ease;
       opacity: 1;
       visibility: visible;
       transform: translateY(0);
-      touch-action: manipulation;
+      width: 80%; /* Larger button for mobile touch */
+      padding: 1rem 0; /* Taller button for easier tapping */
     }
 
     .move-button.hidden {
-      display: none;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(20px);
     }
 
     .winning-images {
@@ -352,15 +364,15 @@
       left: 50%;
       transform: translate(-50%, -50%);
       display: none;
-      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+      gap: 15px;
       z-index: 150;
-      padding: 20px;
+      padding: 15px;
       background: rgba(0, 0, 0, 0.9);
       border-radius: 15px;
       box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
       width: 90%;
-      max-width: 600px;
+      max-width: 400px; /* Reduced for better mobile fit */
     }
 
     .winning-images.show {
@@ -371,13 +383,14 @@
     .winning-images img {
       width: 100%;
       height: auto;
-      min-width: 80px;
+      min-width: 70px;
       object-fit: cover;
       border-radius: 10px;
       border: 2px solid #00ff00;
       box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
       transform: scale(0);
       animation: imagePopIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      aspect-ratio: 1/1; /* Keep images square */
     }
 
     .winning-images img:nth-child(2) {
@@ -403,58 +416,30 @@
       }
     }
 
-    @media (max-width: 480px) {
-      .doll {
-        width: 120px;
-        height: 180px;
-        top: 30px;
-      }
-      .light-status {
-        top: 15%;
-        font-size: clamp(1.5rem, 7vw, 3rem);
-      }
-      .player {
-        bottom: 20%;
-      }
-      .auth-box {
-        padding: 1.5rem;
-        font-size: 0.9rem;
-      }
-    }
-
-    @media (max-width: 768px) {
-      .game-floor {
-        height: 50%;
-      }
-      .player {
-        bottom: 25%;
-      }
-    }
-
+    /* Special adjustments for very small phones */
     @media (max-height: 600px) {
       .doll {
-        top: 20px;
+        top: 5vh;
         transform: translateX(-50%) scale(0.8);
       }
+      
       .light-status {
-        top: 10%;
+        top: 20vh;
+      }
+      
+      .controls {
+        bottom: 5vh;
       }
     }
 
-    @media only screen and (orientation: portrait) {
-      .scene {
-        height: 100vh;
-      }
-      .doll {
-        top: 20px;
-        transform: translateX(-50%) scale(0.8);
-      }
-      .light-status {
-        top: 12%;
-        font-size: clamp(1.8rem, 6vw, 3rem);
-      }
+    /* Portrait orientation specific adjustments */
+    @media (orientation: portrait) {
       .player {
-        bottom: 22%;
+        bottom: 35%;
+      }
+      
+      .game-floor {
+        height: 60%;
       }
     }
   </style>
@@ -499,7 +484,8 @@
   </div>
 
   <script>
-    const correctPassword = "1";
+    // Password Authentication
+    const correctPassword = "1"; // Change as needed
     document.getElementById("authBtn").addEventListener("click", function(){
       const input = document.getElementById("passwordInput").value;
       if(input === correctPassword){
@@ -512,18 +498,32 @@
       }
     });
 
-    let gameState = "green";
+    // Enable enter key for password
+    document.getElementById("passwordInput").addEventListener("keyup", function(event) {
+      if (event.key === "Enter") {
+        document.getElementById("authBtn").click();
+      }
+    });
+
+    // Game Variables
+    let gameState = "green"; // "green" or "red"
     let progress = 0;
     let lightTimer;
+    let gameActive = false;
 
+    // Start the game and light cycle
     function startGame(){
       progress = 0;
+      gameActive = true;
       updateProgress();
       updateLightDisplay();
       lightTimer = setTimeout(changeLight, getRandomGreenDuration());
     }
 
+    // Toggle between green and red light states
     function changeLight(){
+      if(!gameActive) return;
+      
       if(gameState === "green"){
         gameState = "red";
         updateLightDisplay();
@@ -535,6 +535,7 @@
       }
     }
 
+    // Random durations for lights (in ms)
     function getRandomGreenDuration(){
       return Math.floor(Math.random()*2000) + 2000;
     }
@@ -542,6 +543,7 @@
       return Math.floor(Math.random()*2000) + 1000;
     }
 
+    // Updated light display function with background color change
     function updateLightDisplay(){
       const lightDiv = document.querySelector('.light-status');
       const doll = document.querySelector('.doll');
@@ -562,12 +564,16 @@
       }
     }
 
+    // Update player position instead of progress bar
     function updateProgress() {
       const player = document.querySelector('.player');
       player.style.left = (10 + progress * 0.8) + '%';
     }
 
+    // Handle Move button clicks
     document.getElementById("moveBtn").addEventListener("click", function(){
+      if(!gameActive) return;
+      
       const messageEl = document.getElementById("message");
       const moveBtn = document.getElementById("moveBtn");
       
@@ -580,6 +586,7 @@
           messageEl.className = "message visible win";
           document.getElementById("winningImages").classList.add('show');
           clearTimeout(lightTimer);
+          gameActive = false;
           moveBtn.disabled = true;
           return;
         }
@@ -590,12 +597,15 @@
         clearTimeout(lightTimer);
         moveBtn.classList.add('hidden');
         document.getElementById("retryBtn").style.display = "inline-block";
+        gameActive = false;
       }
     });
 
+    // Add retry button functionality
     document.getElementById("retryBtn").addEventListener("click", function() {
       progress = 0;
       gameState = "green";
+      gameActive = true;
       const messageEl = document.getElementById("message");
       const moveBtn = document.getElementById("moveBtn");
       messageEl.className = "message";
@@ -605,4 +615,23 @@
       document.getElementById("winningImages").classList.remove('show');
       updateProgress();
       updateLightDisplay();
-      lightTimer = setTimeout(changeLi
+      lightTimer = setTimeout(changeLight, getRandomGreenDuration());
+    });
+
+    // Prevent double-tap zoom on mobile
+    document.addEventListener('touchstart', function(event) {
+      if (event.touches.length > 1) {
+        event.preventDefault();
+      }
+    }, { passive: false });
+
+    // Disable scrolling when tapping game elements
+    const gameButtons = document.querySelectorAll('.game-button');
+    gameButtons.forEach(button => {
+      button.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+      }, { passive: false });
+    });
+  </script>
+</body>
+</html>
