@@ -10,6 +10,7 @@
       height: 100%;
       margin: 0;
       padding: 0;
+      touch-action: manipulation;
     }
     
     @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap');
@@ -336,74 +337,12 @@
       100% { transform: scale(1); }
     }
 
+    /* Remove disappearing animation; always keep the button visible */
     .move-button {
       transition: all 0.3s ease;
       opacity: 1;
       visibility: visible;
       transform: translateY(0);
-    }
-
-    .move-button.hidden {
-      opacity: 0;
-      visibility: hidden;
-      transform: translateY(20px);
-    }
-
-    .winning-images {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      display: none;
-      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-      gap: 20px;
-      z-index: 150;
-      padding: 20px;
-      background: rgba(0, 0, 0, 0.9);
-      border-radius: 15px;
-      box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
-      width: 90%;
-      max-width: 600px;
-    }
-
-    .winning-images.show {
-      display: grid;
-      animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    .winning-images img {
-      width: 100%;
-      height: auto;
-      min-width: 80px;
-      object-fit: cover;
-      border-radius: 10px;
-      border: 2px solid #00ff00;
-      box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
-      transform: scale(0);
-      animation: imagePopIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-    }
-
-    .winning-images img:nth-child(2) {
-      animation-delay: 0.2s;
-    }
-
-    .winning-images img:nth-child(3) {
-      animation-delay: 0.4s;
-    }
-
-    @keyframes popIn {
-      from {
-        transform: translate(-50%, -50%) scale(0);
-      }
-      to {
-        transform: translate(-50%, -50%) scale(1);
-      }
-    }
-
-    @keyframes imagePopIn {
-      to {
-        transform: scale(1);
-      }
     }
 
     @media (max-width: 480px) {
@@ -574,7 +513,8 @@
         messageEl.innerText = "Game Over!\nYou moved during RED LIGHT";
         messageEl.className = "message visible lose";
         clearTimeout(lightTimer);
-        moveBtn.classList.add('hidden');
+        // Instead of hiding, disable the button so it remains visible
+        moveBtn.disabled = true;
         document.getElementById("retryBtn").style.display = "inline-block";
       }
     });
@@ -585,7 +525,6 @@
       const messageEl = document.getElementById("message");
       const moveBtn = document.getElementById("moveBtn");
       messageEl.className = "message";
-      moveBtn.classList.remove('hidden');
       moveBtn.disabled = false;
       document.getElementById("retryBtn").style.display = "none";
       document.getElementById("winningImages").classList.remove('show');
