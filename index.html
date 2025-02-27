@@ -416,6 +416,11 @@
       }
     }
 
+    /* Fix for hiding auth overlay */
+    .hidden {
+      display: none !important;
+    }
+
     /* Special adjustments for very small phones */
     @media (max-height: 600px) {
       .doll {
@@ -484,14 +489,27 @@
   </div>
 
   <script>
+    // DOM elements
+    const authOverlay = document.getElementById("auth");
+    const passwordInput = document.getElementById("passwordInput");
+    const authBtn = document.getElementById("authBtn");
+    const moveBtn = document.getElementById("moveBtn");
+    const retryBtn = document.getElementById("retryBtn");
+    const messageEl = document.getElementById("message");
+    const winningImages = document.getElementById("winningImages");
+    const player = document.querySelector('.player');
+    const lightStatus = document.querySelector('.light-status');
+    const doll = document.querySelector('.doll');
+    const gameContainer = document.querySelector('.game-container');
+
     // Password Authentication
     const correctPassword = "1"; // Change as needed
-    document.getElementById("authBtn").addEventListener("click", function(){
-      const input = document.getElementById("passwordInput").value;
+    
+    // Fix for authentication
+    authBtn.addEventListener("click", function(){
+      const input = passwordInput.value;
       if(input === correctPassword){
-        document.getElementById("auth").style.display = "none";
-        document.querySelector(".auth-overlay").style.display = "none";
-        document.querySelector(".game-container").style.display = "block";
+        authOverlay.classList.add("hidden");
         startGame();
       } else {
         alert("Incorrect password. Try again.");
@@ -499,9 +517,9 @@
     });
 
     // Enable enter key for password
-    document.getElementById("passwordInput").addEventListener("keyup", function(event) {
+    passwordInput.addEventListener("keyup", function(event) {
       if (event.key === "Enter") {
-        document.getElementById("authBtn").click();
+        authBtn.click();
       }
     });
 
@@ -545,37 +563,29 @@
 
     // Updated light display function with background color change
     function updateLightDisplay(){
-      const lightDiv = document.querySelector('.light-status');
-      const doll = document.querySelector('.doll');
-      const gameContainer = document.querySelector('.game-container');
-      
       if(gameState === "green") {
-        lightDiv.innerText = "GREEN LIGHT";
-        lightDiv.style.color = "#00FF00";
+        lightStatus.innerText = "GREEN LIGHT";
+        lightStatus.style.color = "#00FF00";
         doll.classList.add('turned');
         gameContainer.classList.add('green-light');
         gameContainer.classList.remove('red-light');
       } else {
-        lightDiv.innerText = "RED LIGHT";
-        lightDiv.style.color = "#FF0000";
+        lightStatus.innerText = "RED LIGHT";
+        lightStatus.style.color = "#FF0000";
         doll.classList.remove('turned');
         gameContainer.classList.add('red-light');
         gameContainer.classList.remove('green-light');
       }
     }
 
-    // Update player position instead of progress bar
+    // Update player position
     function updateProgress() {
-      const player = document.querySelector('.player');
       player.style.left = (10 + progress * 0.8) + '%';
     }
 
-    // Handle Move button clicks
-    document.getElementById("moveBtn").addEventListener("click", function(){
+    // Handle Move button clicks (fixed)
+    moveBtn.addEventListener("click", function(){
       if(!gameActive) return;
-      
-      const messageEl = document.getElementById("message");
-      const moveBtn = document.getElementById("moveBtn");
       
       if(gameState === "green"){
         progress += 10;
@@ -584,7 +594,7 @@
           updateProgress();
           messageEl.innerText = "You Won!";
           messageEl.className = "message visible win";
-          document.getElementById("winningImages").classList.add('show');
+          winningImages.classList.add('show');
           clearTimeout(lightTimer);
           gameActive = false;
           moveBtn.disabled = true;
@@ -596,23 +606,21 @@
         messageEl.className = "message visible lose";
         clearTimeout(lightTimer);
         moveBtn.classList.add('hidden');
-        document.getElementById("retryBtn").style.display = "inline-block";
+        retryBtn.style.display = "inline-block";
         gameActive = false;
       }
     });
 
     // Add retry button functionality
-    document.getElementById("retryBtn").addEventListener("click", function() {
+    retryBtn.addEventListener("click", function() {
       progress = 0;
       gameState = "green";
       gameActive = true;
-      const messageEl = document.getElementById("message");
-      const moveBtn = document.getElementById("moveBtn");
       messageEl.className = "message";
       moveBtn.classList.remove('hidden');
       moveBtn.disabled = false;
-      document.getElementById("retryBtn").style.display = "none";
-      document.getElementById("winningImages").classList.remove('show');
+      retryBtn.style.display = "none";
+      winningImages.classList.remove('show');
       updateProgress();
       updateLightDisplay();
       lightTimer = setTimeout(changeLight, getRandomGreenDuration());
@@ -625,13 +633,20 @@
       }
     }, { passive: false });
 
-    // Disable scrolling when tapping game elements
+    // Make buttons more responsive on mobile
     const gameButtons = document.querySelectorAll('.game-button');
     gameButtons.forEach(button => {
+      // Use touchstart for faster response on mobile
       button.addEventListener('touchstart', function(e) {
+        // Prevent default to avoid any delay
         e.preventDefault();
+        // Manually trigger click event
+        this.click();
       }, { passive: false });
     });
+
+    // Debug helper - log when elements are clicked
+    console.log("Game loaded and ready");
   </script>
 </body>
 </html>
