@@ -2,12 +2,21 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Protected Page</title>
+    <script>
+        function checkPassword() {
+            let password = prompt("Enter the password:");
+            if (password !== "yourpassword") {
+                alert("Incorrect password. Access denied.");
+                document.body.innerHTML = "";
+            }
+        }
+    </script>
 </head>
-<body>
+<body onload="checkPassword()">
     <h1>Confidential Numbers</h1>
     <p>Number 1: 12345</p>
     <p>Number 2: 67890</p>
-    <!-- Add more numbers as needed -->
 </body>
 </html>
