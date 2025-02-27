@@ -2,13 +2,16 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <!-- Added maximum-scale=1.0 to prevent zooming on double tap -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
   <title>The Sqout Game Challenge</title>
   <style>
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      -webkit-user-select: none; /* Disable text selection on iOS Safari */
+      -webkit-touch-callout: none; /* Disable callout (copy/paste) on iOS Safari */
     }
   
     @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap');
@@ -247,7 +250,8 @@
       font-size: clamp(1rem, 4vw, 1.2rem);
       border-radius: 8px;
       cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
+      /* Prevent double-tap zoom on iOS */
+      touch-action: manipulation;
     }
 
     .game-button:hover {
@@ -321,6 +325,7 @@
       border: 2px solid #ff3333;
       text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
       box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+      touch-action: manipulation;
     }
 
     @keyframes pulse {
@@ -330,16 +335,15 @@
     }
 
     .move-button {
-      transition: all 0.3s ease;
+      /* Removed transition to avoid glitches */
       opacity: 1;
       visibility: visible;
       transform: translateY(0);
+      touch-action: manipulation;
     }
 
     .move-button.hidden {
-      opacity: 0;
-      visibility: hidden;
-      transform: translateY(20px);
+      display: none;
     }
 
     .winning-images {
@@ -437,7 +441,6 @@
       }
     }
 
-    /* Additional tweak for portrait mode */
     @media only screen and (orientation: portrait) {
       .scene {
         height: 100vh;
@@ -496,7 +499,7 @@
   </div>
 
   <script>
-    const correctPassword = "1"; // Change as needed
+    const correctPassword = "1";
     document.getElementById("authBtn").addEventListener("click", function(){
       const input = document.getElementById("passwordInput").value;
       if(input === correctPassword){
@@ -602,8 +605,4 @@
       document.getElementById("winningImages").classList.remove('show');
       updateProgress();
       updateLightDisplay();
-      lightTimer = setTimeout(changeLight, getRandomGreenDuration());
-    });
-  </script>
-</body>
-</html>
+      lightTimer = setTimeout(changeLi
