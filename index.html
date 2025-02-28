@@ -35,6 +35,8 @@
       height: 100vh; /* Ensure full height on mobile */
       background: linear-gradient(135deg, var(--squid-pink) 0%, #ff4d94 100%);
       overflow: hidden;
+      /* Ensure content stays within the viewport */
+      padding-top: env(safe-area-inset-top);
     }
 
     .game-container::before {
@@ -58,13 +60,15 @@
       position: relative;
       height: 100vh;
       width: 100%;
+      /* Add top padding to ensure content doesn't hide behind browser UI */
+      padding-top: 10px;
     }
 
     .doll {
       width: min(120px, 30vw);
       height: min(180px, 45vw);
       position: absolute;
-      top: 8vh;
+      top: 15vh; /* Adjusted to be lower and more visible */
       left: 50%;
       transform-style: preserve-3d;
       transform: translateX(-50%);
@@ -203,7 +207,7 @@
 
     .light-status {
       position: absolute;
-      top: 25vh; /* Better positioning for mobile */
+      top: 30vh; /* Adjusted to be lower and more visible */
       left: 50%;
       transform: translateX(-50%);
       font-size: min(10vw, 3rem); /* Responsive font size */
@@ -424,12 +428,12 @@
     /* Special adjustments for very small phones */
     @media (max-height: 600px) {
       .doll {
-        top: 5vh;
+        top: 18vh;
         transform: translateX(-50%) scale(0.8);
       }
       
       .light-status {
-        top: 20vh;
+        top: 30vh;
       }
       
       .controls {
@@ -583,12 +587,13 @@
       player.style.left = (10 + progress * 0.8) + '%';
     }
 
-    // Handle Move button clicks (fixed)
+    // Handle Move button clicks - MODIFIED to use smaller steps
     moveBtn.addEventListener("click", function(){
       if(!gameActive) return;
       
       if(gameState === "green"){
-        progress += 10;
+        // Changed from 10 to 5 for smaller steps
+        progress += 5;
         if(progress >= 100){
           progress = 100;
           updateProgress();
